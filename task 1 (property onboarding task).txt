@@ -1,0 +1,63 @@
+vijetha (task 1 code)
+
+task 1 
+
+a. dispaly a list of all property names and their property id's for owner id:1426.
+   
+     SELECT property.Name,OwnerProperty.OwnerId,OwnerProperty.PropertyId
+     FROM OwnerProperty INNER JOIN
+           Property
+     ON ownerproperty.propertyid = property.id
+     where [ownerid] = '1426'
+
+
+b. 
+ select property.Name,OwnerProperty.OwnerId,OwnerProperty.PropertyId,PropertyHomeValue.value
+FROM OwnerProperty INNER JOIN  Property
+ON OwnerProperty.PropertyId=Property.Id INNER JOIN PropertyHomeValue
+ON Property.Id =PropertyHomeValue.PropertyId
+where [OwnerId]='1426'
+
+
+c.  (i) query to write sum of all payments from start date to end date 
+
+
+
+ 
+  (ii) display the yield 
+   
+      Select [dbo].[TenantProperty].TenantID, [dbo].[TenantProperty].PropertyID, [dbo].[TenantProperty].PaymentFrequencyID, [dbo].[TenantProperty].PaymentAmount,
+IIf([dbo].[TenantProperty].PaymentFrequencyId=1, [dbo].[TenantProperty].PaymentAmount*Datediff(week,[dbo].[TenantProperty].StartDate,[dbo].[TenantProperty].Enddate),
+    IIF([dbo].[TenantProperty].PaymentFrequencyId=2, [dbo].[TenantProperty].PaymentAmount*(Datediff(week,[dbo].[TenantProperty].StartDate,[dbo].[TenantProperty].Enddate)/2),
+	 [dbo].[TenantProperty].PaymentAmount*(Datediff(month,[dbo].[TenantProperty].StartDate,[dbo].[TenantProperty].Enddate)+1))) as SumOfPayment
+from [dbo].[TenantProperty] 
+where [dbo].[TenantProperty].PropertyId in (Select [dbo].[Property].Id
+                     from [dbo].[Property] inner join [dbo].[OwnerProperty] on
+                     [dbo].[OwnerProperty].PropertyId = [dbo].[Property].Id
+                     where [dbo].[OwnerProperty].OwnerId = 1426)
+order by [dbo].[TenantProperty].PropertyID;
+
+
+
+
+(d) display all the jobs available inthe market place (jobs that owners advertised for service suppliers)
+
+     select * from [dbo].[job]
+ inner join ServiceProviderJobStatus
+on job.JobStatusId = ServiceProviderJobStatus.Id
+where Job.JobDescription like '%service%';
+
+
+(e.)
+    
+     Select [dbo].[TenantProperty].TenantId, [dbo].[Property].Id, [dbo].[Property].Name as PropertyName, [dbo].[Person].FirstName, [dbo].[Person].LastName, 
+       [dbo].[TenantProperty].PaymentAmount, [dbo].[TenantProperty].PaymentFrequencyId, [dbo].[TenantPaymentFrequencies].Name as Frequency
+From [dbo].[Person] inner join [dbo].[Tenant] on [dbo].[Person].Id = [dbo].[Tenant].Id 
+                    inner join [dbo].[TenantProperty] on [dbo].[Tenant].Id = [dbo].[TenantProperty].TenantId
+					inner join [dbo].[Property] on [dbo].[TenantProperty].PropertyId = [dbo].[Property].Id
+					inner join [dbo].[TenantPaymentFrequencies] on [dbo].[TenantPaymentFrequencies].Id = [dbo].[TenantProperty].PaymentFrequencyId
+where [dbo].[Property].Id in (Select [dbo].[Property].Id
+                     from [dbo].[Property] inner join [dbo].[OwnerProperty] on
+                     [dbo].[OwnerProperty].PropertyId = [dbo].[Property].Id
+                     where [dbo].[OwnerProperty].OwnerId = 1426)
+order by [dbo].[Property].Id;
